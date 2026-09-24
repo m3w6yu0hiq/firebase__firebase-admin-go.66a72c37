@@ -569,7 +569,7 @@ func (config *SAMLProviderConfigToUpdate) buildRequest() (nestedMap, error) {
 		return nil, errors.New("no parameters specified in the update request")
 	}
 
-	if val, _ := config.params.GetString(idpEntityIDKey); val == "" {
+	if val, ok := config.params.GetString(idpEntityIDKey); ok && val == "" {
 		return nil, errors.New("IDPEntityID must not be empty")
 	}
 
@@ -577,15 +577,17 @@ func (config *SAMLProviderConfigToUpdate) buildRequest() (nestedMap, error) {
 		if val == "" {
 			return nil, errors.New("SSOURL must not be empty")
 		}
-		url.ParseRequestURI(val)
+		if _, err := url.ParseRequestURI(val); err != nil {
+			return nil, fmt.Errorf("failed to parse SSOURL: %v", err)
+		}
 	}
 
 	if val, ok := config.params.Get(idpCertsKey); ok {
-		if val.([]idpCertificate) == nil {
+		if len(val.([]idpCertificate)) == 0 {
 			return nil, errors.New("X509Certificates must not be empty")
 		}
 		for _, cert := range val.([]idpCertificate) {
-			if cert.X509Certificate == " " {
+			if cert.X509Certificate == "" {
 				return nil, errors.New("X509Certificates must not contain empty strings")
 			}
 		}
