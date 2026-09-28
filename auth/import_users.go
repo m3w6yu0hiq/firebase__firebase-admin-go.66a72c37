@@ -53,10 +53,10 @@ type ErrorInfo struct {
 func (c *baseClient) ImportUsers(
 	ctx context.Context, users []*UserToImport, opts ...UserImportOption) (*UserImportResult, error) {
 
-	if users == nil {
+	if len(users) == 0 {
 		return nil, errors.New("users list must not be empty")
 	}
-	if len(users) >= maxImportUsers {
+	if len(users) > maxImportUsers {
 		return nil, fmt.Errorf("users list must not contain more than %d elements", maxImportUsers)
 	}
 
@@ -82,7 +82,7 @@ func (c *baseClient) ImportUsers(
 		}
 	}
 	if hashRequired {
-		if algo, ok := req["hashAlgorithm"]; !ok && algo == "" {
+		if algo, ok := req["hashAlgorithm"]; !ok || algo == "" {
 			return nil, errors.New("hash algorithm option is required to import users with passwords")
 		}
 	}
@@ -104,7 +104,7 @@ func (c *baseClient) ImportUsers(
 	}
 	for _, e := range parsed.Error {
 		result.Errors = append(result.Errors, &ErrorInfo{
-			Index:  int(e.Index) + 1,
+			Index:  int(e.Index),
 			Reason: e.Message,
 		})
 	}
