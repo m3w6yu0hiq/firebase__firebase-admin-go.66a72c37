@@ -411,7 +411,7 @@ func (k *httpKeySource) refreshKeys(ctx context.Context) error {
 		return err
 	}
 
-	resp, err := k.HTTPClient.Do(req)
+	resp, err := k.HTTPClient.Do(req.WithContext(ctx))
 	if err != nil {
 		return err
 	}
@@ -429,13 +429,13 @@ func (k *httpKeySource) refreshKeys(ctx context.Context) error {
 
 	newKeys, err := parsePublicKeys(contents)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	maxAge := findMaxAge(resp)
 
 	k.CachedKeys = append([]*publicKey(nil), newKeys...)
-	k.ExpiryTime = k.Clock.Now().Add(-*maxAge)
+	k.ExpiryTime = k.Clock.Now().Add(*maxAge)
 	return nil
 }
 
