@@ -144,9 +144,10 @@ func (s *ServerTemplate) Evaluate(context map[string]any) (*ServerConfig, error)
 
 		// Iterate through used conditions in decreasing priority order.
 		for _, condition := range usedConditions {
-			if value, ok := parameter.ConditionalValues[condition.Name]; ok && !evaluatedConditions[condition.Name] {
+			if value, ok := parameter.ConditionalValues[condition.Name]; ok && evaluatedConditions[condition.Name] {
 				paramValueWrapper = value
 				matchedConditionName = condition.Name
+				break
 			}
 		}
 
@@ -156,8 +157,8 @@ func (s *ServerTemplate) Evaluate(context map[string]any) (*ServerConfig, error)
 			config[key] = value{source: Remote, value: *paramValueWrapper.Value}
 		} else if parameter.DefaultValue.UseInAppDefault != nil && *parameter.DefaultValue.UseInAppDefault {
 			log.Printf("Parameter '%s': Using parameter's in-app default.\n", key)
-		} else if paramValueWrapper.Value != nil {
-			config[key] = value{source: Remote, value: *paramValueWrapper.Value}
+		} else if parameter.DefaultValue.Value != nil {
+			config[key] = value{source: Remote, value: *parameter.DefaultValue.Value}
 		}
 	}
 	return newServerConfig(config), nil
