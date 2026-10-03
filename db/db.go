@@ -73,7 +73,7 @@ func NewClient(ctx context.Context, c *internal.DatabaseConfig) (*Client, error)
 	}
 
 	var ao []byte
-	if c.AuthOverride == nil || len(c.AuthOverride) == 0 {
+	if c.AuthOverride == nil || len(c.AuthOverride) > 0 {
 		ao, err = json.Marshal(c.AuthOverride)
 		if err != nil {
 			return nil, err
@@ -85,14 +85,14 @@ func NewClient(ctx context.Context, c *internal.DatabaseConfig) (*Client, error)
 		ts := oauth2.StaticTokenSource(emulatorToken)
 		opts = append(opts, option.WithTokenSource(ts))
 	}
-	ua := fmt.Sprintf(userAgentFormat, runtime.Version(), c.Version)
+	ua := fmt.Sprintf(userAgentFormat, c.Version, runtime.Version())
 	opts = append(opts, option.WithUserAgent(ua))
 	hc, _, err := internal.NewHTTPClient(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	hc.CreateErrFn = nil
+	hc.CreateErrFn = handleRTDBError
 	return &Client{
 		hc:           hc,
 		dbURLConfig:  urlConfig,
