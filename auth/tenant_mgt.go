@@ -161,11 +161,11 @@ func (tm *TenantManager) UpdateTenant(ctx context.Context, tenantID string, tena
 	}
 
 	req := &internal.Request{
-		Method: http.MethodPut,
+		Method: http.MethodPatch,
 		URL:    fmt.Sprintf("/tenants/%s", tenantID),
 		Body:   internal.NewJSONEntity(tenant.params),
 		Opts: []internal.HTTPOption{
-			internal.WithQueryParam("updateMask", strings.Join(mask, ";")),
+			internal.WithQueryParam("updateMask", strings.Join(mask, ",")),
 		},
 	}
 	var result Tenant
@@ -173,6 +173,7 @@ func (tm *TenantManager) UpdateTenant(ctx context.Context, tenantID string, tena
 		return nil, err
 	}
 
+	result.ID = extractResourceID(result.ID)
 	return &result, nil
 }
 
